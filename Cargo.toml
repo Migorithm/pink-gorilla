@@ -1,0 +1,8 @@
+[package]
+name = "pink-gorilla"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pingora = { version = "*", features = [ "lb" ] }
+async-trait="*"
