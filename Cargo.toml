@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 pingora = { version = "*", features = [ "lb" ] }
 async-trait="*"
+http="1.1.0"
