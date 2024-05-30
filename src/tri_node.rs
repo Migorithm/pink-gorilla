@@ -29,10 +29,11 @@ impl Trie {
         node.is_end_of_key = true;
     }
 
+    /// returns the longest prefix that matches the input string
     pub fn search(&self, s: &str) -> Option<String> {
         let mut node = &self.root;
-        let mut matched_prefix = String::new();
 
+        let mut matched_prefix = String::new();
         for ch in s.chars() {
             if let Some(next_node) = node.children.get(&ch) {
                 matched_prefix.push(ch);
@@ -44,19 +45,16 @@ impl Trie {
                 break;
             }
         }
-
         None
     }
 }
 
 #[test]
 fn test_trie_node() {
-    let mut map = HashMap::new();
-    map.insert("foo", "value1");
-    map.insert("bar", "value2");
+    let keys = ["foo", "bar"];
 
     let mut trie = Trie::default();
-    for key in map.keys() {
+    for key in keys {
         trie.insert(key);
     }
 
@@ -65,4 +63,19 @@ fn test_trie_node() {
         panic!("No match found");
     };
     assert_eq!(matched_part, "foo");
+}
+
+#[test]
+fn test_trie_node_fail_case() {
+    let keys = ["foo", "bar", "foos"];
+
+    let mut trie = Trie::default();
+    for key in keys {
+        trie.insert(key);
+    }
+
+    let test_str = "fobar";
+    let None = trie.search(test_str) else {
+        panic!("No match found");
+    };
 }

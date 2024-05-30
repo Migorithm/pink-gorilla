@@ -11,12 +11,12 @@ macro_rules! add_loadbalanced_service {
     (   $server:ident,
         $mapper:ident,
         $(
-            $prefix: literal=> $addr:literal
+            $prefix: literal=> $addr:expr
         ),*
     ) => {
 
         $(
-        let mut service =  LoadBalancer::try_from_iter([$addr]).unwrap();
+        let mut service =  LoadBalancer::try_from_iter($addr).unwrap();
         // adding a basic health check service. So all requests succeed and the broken peer is never used.
         // if that peer were to become healthy again, it would be re-included in the round robin again in within 1 second.
         let hc = TcpHealthCheck::new();
@@ -37,8 +37,8 @@ fn main() {
     let mut service_mapper = HashMap::new();
 
     add_loadbalanced_service!(server,service_mapper,
-        "/auth" => "0.0.0.0:44410",
-        "/task" => "0.0.0.0:44447"
+        "/auth" => ["0.0.0.0:44410","0.0.0.0:44411"],
+        "/task" => ["0.0.0.0:44447"]
     );
 
     let mut path_mapper = Trie::default();
@@ -85,9 +85,9 @@ impl ProxyHttp for LB {
         let addr = self
             .service_mapper
             .get(path.as_str())
-            .unwrap()
+            .expect("This can't fail")
             .select(b"", 256)
-            .unwrap();
+            .expect("all upstream services are down");
 
         println!("found upstream peer...{:?}", addr);
 
